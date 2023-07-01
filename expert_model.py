@@ -16,9 +16,18 @@ class VAE(nn.Module):
 
         # Decoder
         self.decoder = nn.Sequential(
-            nn.Linear(self.latent_dim, 512),
-            nn.ReLU(True),
-            nn.Linear(512, 32 * 32 * 3),
+            nn.Linear(latent_dim, 256),
+            nn.ReLU(inplace=True),
+            nn.Linear(256, 512),
+            nn.ReLU(inplace=True),
+            nn.Linear(512, 1024),
+            nn.ReLU(inplace=True),
+            nn.Unflatten(1, (64, 4, 4)),
+            nn.ConvTranspose2d(64, 32, kernel_size=4, stride=2, padding=1),
+            nn.ReLU(inplace=True),
+            nn.ConvTranspose2d(32, 16, kernel_size=4, stride=2, padding=1),
+            nn.ReLU(inplace=True),
+            nn.ConvTranspose2d(16, 3, kernel_size=4, stride=2, padding=1),
             nn.Sigmoid()
         )
 
@@ -31,7 +40,6 @@ class VAE(nn.Module):
 
     def decode(self, z):
         x = self.decoder(z)
-        x = x.view(x.size(0), 3, 32, 32)
         return x
 
     def reparameterize(self, mu, logvar):
