@@ -19,7 +19,7 @@ def train_vae(model, data, save_path):
 
             model(images)
 
-            loss = model.recon_loss + 0.000001 * model.kl_loss
+            loss = model.recon_loss + 0.000000001 * model.kl_loss
 
             optimizer.zero_grad()
             loss.backward()
